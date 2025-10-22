@@ -61,7 +61,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // Inserting Row
         db.insert(TABLE_CONTACTS, null, values);
-        db.close(); // Closing database connection
+        // Don't close db here - let Android manage the connection
+        // This allows Database Inspector to inspect the database while app is running
     }
 
     // Getting single contact
@@ -76,7 +77,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         Contact contact = new Contact(Integer.parseInt(cursor.getString(0)),
                 cursor.getString(1), cursor.getString(2));
-        cursor.close();
+        cursor.close(); // Close cursor, not database
         return contact;
     }
 
@@ -124,7 +125,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_CONTACTS, KEY_ID + " = ?",
                 new String[]{String.valueOf(contact.getId())});
-        db.close();
+        // Don't close db here - let Android manage the connection
     }
 }
 

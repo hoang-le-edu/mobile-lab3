@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.lab3.adapter.ContactAdapter;
 import com.example.lab3.adapter.DbAdapter;
 import com.example.lab3.handler.DatabaseHandler;
 import com.example.lab3.model.Contact;
@@ -20,13 +22,17 @@ public class MainActivity extends AppCompatActivity {
     private DbAdapter dbAdapter;
     private Cursor cursor;
     private List<String> users;
+    
+    private DatabaseHandler db;
+    private List<Contact> contacts;
+    private ContactAdapter contactAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Part 1: Test DbAdapter with users
+        // Part 1: Test DbAdapter with users (chạy ngầm để test)
         dbAdapter = new DbAdapter(this);
         dbAdapter.open();
         dbAdapter.deleteAllUsers();
@@ -36,10 +42,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         users = getData();
-        showData();
+        // showData(); // Commented out vì giờ hiển thị Contact
 
         // Part 2: Test DatabaseHandler with contacts
-        DatabaseHandler db = new DatabaseHandler(this);
+        db = new DatabaseHandler(this);
 
         /**
          * CRUD Operations
@@ -53,13 +59,19 @@ public class MainActivity extends AppCompatActivity {
 
         // Reading all contacts
         Log.d("Reading: ", "Reading all contacts..");
-        List<Contact> contacts = db.getAllContacts();
+        contacts = db.getAllContacts();
 
         for (Contact cn : contacts) {
             String log = "Id: " + cn.getId() + " ,Name: " + cn.getName() + " ,Phone: " + cn.getPhoneNumber();
             // Writing Contacts to log
             Log.d("Name: ", log);
         }
+
+        // Hiển thị Contact list lên ListView
+        showContactData();
+        
+        // Xử lý long click để xóa contact
+        setupLongClickListener();
     }
 
     private List<String> getData() {
@@ -77,5 +89,43 @@ public class MainActivity extends AppCompatActivity {
         ListView lvUser = findViewById(R.id.lv_user);
         ArrayAdapter<String> userAdapter = new ArrayAdapter<>(MainActivity.this, R.layout.item_user, users);
         lvUser.setAdapter(userAdapter);
+    }
+
+    private void showContactData() {
+        ListView lvUser = findViewById(R.id.lv_user);
+        contactAdapter = new ContactAdapter(this, contacts);
+        lvUser.setAdapter(contactAdapter);
+    }
+
+    private void setupLongClickListener() {
+        ListView lvUser = findViewById(R.id.lv_user);
+        
+        lvUser.setOnItemLongClickListener((parent, view, position, id) -> {
+            // Lấy contact tại vị trí được long click
+            Contact contactToDelete = contacts.get(position);
+            
+            // Xóa contact khỏi database
+            db.deleteContact(contactToDelete);
+            
+            // Xóa contact khỏi list
+            contacts.remove(position);
+            
+            // Cập nhật lại ListView
+            refreshContactList();
+            
+            // Hiển thị thông báo
+            Toast.makeText(MainActivity.this, 
+                    "Đã xóa: " + contactToDelete.getName(), 
+                    Toast.LENGTH_SHORT).show();
+            
+            // Log
+            Log.d("Delete: ", "Deleted contact: " + contactToDelete.getName());
+            
+            return true; // Consume the long click event
+        });
+    }
+
+    private void refreshContactList() {
+        contactAdapter.notifyDataSetChanged();
     }
 }
