@@ -27,6 +27,16 @@
         android:gravity="center"
         android:background="#E3F2FD" />
 
+    <Button
+        android:id="@+id/btn_goto_student"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🎓 Quản Lý Sinh Viên"
+        android:textSize="16sp"
+        android:backgroundTint="#4CAF50"
+        android:textColor="#FFFFFF"
+        android:layout_margin="16dp" />
+
     <ListView
         android:id="@+id/lv_user"
         android:layout_width="match_parent"

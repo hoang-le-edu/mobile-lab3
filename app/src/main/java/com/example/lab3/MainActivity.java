@@ -1,9 +1,11 @@
 package com.example.lab3;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -26,11 +28,19 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseHandler db;
     private List<Contact> contacts;
     private ContactAdapter contactAdapter;
+    private Button btnGotoStudent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Button to navigate to Student Management
+        btnGotoStudent = findViewById(R.id.btn_goto_student);
+        btnGotoStudent.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, StudentActivity.class);
+            startActivity(intent);
+        });
 
         // Part 1: Test DbAdapter with users (chạy ngầm để test)
         dbAdapter = new DbAdapter(this);
